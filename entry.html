@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entry - JMD Traders</title>
+
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <h2>➕ Daily Entry</h2>
+
+    <!-- DATE -->
+    <input type="date" id="entryDate">
+
+    <!-- SHOP 1 -->
+    <div class="card">
+        <h3>Sankat Mochan</h3>
+        <input type="number" id="s1_open" placeholder="Opening">
+        <input type="number" id="s1_home" placeholder="To Home">
+        <input type="number" id="s1_close" placeholder="Closing">
+        <input type="number" id="s1_exp" placeholder="Expense">
+        <input type="number" id="s1_gpay" placeholder="GPay">
+    </div>
+
+    <!-- SHOP 2 -->
+    <div class="card">
+        <h3>JMD Pooja</h3>
+        <input type="number" id="s2_open" placeholder="Opening">
+        <input type="number" id="s2_home" placeholder="To Home">
+        <input type="number" id="s2_close" placeholder="Closing">
+        <input type="number" id="s2_exp" placeholder="Expense">
+        <input type="number" id="s2_gpay" placeholder="GPay">
+    </div>
+
+    <!-- EXPENSE -->
+    <div class="card">
+        <textarea id="exp_details" placeholder="Expense Details"></textarea>
+        <input type="number" id="jeb_pay_out" placeholder="Home Expense">
+        <input type="number" id="gpay_exp" placeholder="GPay Expense">
+    </div>
+
+    <!-- BUTTONS -->
+    <button onclick="saveEntry()">SAVE</button>
+    <button onclick="shareToWhatsApp()">WHATSAPP</button>
+
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html">🏠</a>
+  <a href="entry.html">➕</a>
+  <a href="history.html">📜</a>
+  <a href="analytics.html">📊</a>
+</nav>
+
+<script src="js/app.js"></script>
+<script src="js/entry.js"></script>
+
+</body>
+</html>
