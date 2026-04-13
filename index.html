@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JMD Traders - Management Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --bg: #0d0e12; --card: #1a1b1f; --primary: #f1c40f; --secondary: #2ecc71; --error: #e74c3c; --text: #f5f6fa; --nav-bg: #16171b; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* Premium Navigation */
+        nav { display: flex; justify-content: space-around; background: var(--nav-bg); padding: 15px 0; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        nav button { background: none; border: none; color: #777; font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        nav button.active { color: var(--primary); transform: scale(1.1); border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+
+        .container { padding: 15px; max-width: 900px; margin: auto; }
+        .app-section { display: none; animation: fadeIn 0.4s ease; }
+        .app-section.active { display: block; }
+
+        /* Card Styles */
+        .card { background: var(--card); border-radius: 16px; padding: 20px; border: 1px solid #2a2b30; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        h2 { color: var(--primary); font-size: 1.2rem; margin-top: 0; border-left: 4px solid var(--primary); padding-left: 10px; }
+
+        /* Table & List Styling */
+        .table-wrapper { overflow-x: auto; border-radius: 12px; background: #111216; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { background: #1c1d22; color: var(--primary); padding: 12px; text-align: left; font-size: 12px; }
+        td { padding: 14px 12px; border-bottom: 1px solid #222; font-size: 13px; font-weight: 600; }
+        
+        /* Labels & Status */
+        .amt-pos { color: var(--secondary); }
+        .amt-neg { color: var(--error); }
+        .date-chip { background: #25262b; padding: 4px 8px; border-radius: 6px; font-family: monospace; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<nav>
+    <button onclick="showSection('home', this)" class="active">🏠 Entry</button>
+    <button onclick="showSection('history', this)">📜 History</button>
+    <button onclick="showSection('analytics', this)">📊 Reports</button>
+</nav>
+
+<div class="container">
+    <section id="home" class="app-section active">
+        <div class="card">
+            <h2>New Daily Entry</h2>
+            <p style="color:#888; font-size: 13px;">Enter sales data for your 4 shops.</p>
+            </div>
+    </section>
+
+    <section id="history" class="app-section">
+        <div class="card">
+            <h2>Transaction Logs</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Total Sale</th>
+                            <th>40% Savings</th>
+                            <th>Net Cash</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="analytics" class="app-section">
+        <div class="card">
+            <h2>Business Performance</h2>
+            <canvas id="growthChart" height="200"></canvas>
+        </div>
+        <div class="card" id="summaryStats">
+            </div>
+    </section>
+</div>
+
+<script>
+    // Config: Apna URL yahan zaroor daalein
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuIgJpUnkBegcB1lRxZkEB7F4WPRWKwvX9BuOVFwZV0Nq2lBheDG5QSYVeJVcmyZClPA/exec';
+    let rawData = [];
+
+    function showSection(id, btn) {
+        document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+        if(id === 'analytics') updateCharts();
+    }
+
+    // DATE FIXER: Ise use karne se "11T18:30" wala issue nahi aayega
+    function formatSafeDate(dateStr) {
+        if(!dateStr) return "-";
+        // Agar ISO format hai toh sirf date lo
+        let clean = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+        let parts = clean.split('-');
+        return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : clean;
+    }
+
+    async function fetchData() {
+        try {
+            const res = await fetch(SCRIPT_URL);
+            rawData = await res.json();
+            renderHistory();
+        } catch (e) { console.error("Sync Error", e); }
+    }
+
+    function renderHistory() {
+        const body = document.getElementById('historyBody');
+        body.innerHTML = rawData.map(item => `
+            <tr>
+                <td><span class="date-chip">${formatSafeDate(item.date)}</span></td>
+                <td>₹${item.sale.toLocaleString()}</td>
+                <td class="amt-pos">₹${(item.cash + item.bank).toLocaleString()}</td>
+                <td class="${item.netCash < 0 ? 'amt-neg' : 'amt-pos'}">₹${item.netCash.toLocaleString()}</td>
+            </tr>
+        `).join('');
+    }
+
+    function updateCharts() {
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        const labels = rawData.slice(-7).map(d => formatSafeDate(d.date));
+        const sales = rawData.slice(-7).map(d => d.sale);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sale Trend',
+                    data: sales,
+                    borderColor: '#f1c40f',
+                    backgroundColor: 'rgba(241, 196, 15, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+    }
+
+    window.onload = fetchData;
+</script>
+
+</body>
+</html>
