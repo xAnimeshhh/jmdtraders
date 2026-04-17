@@ -985,15 +985,15 @@ window.onload = fetchSheetData;
     const details = t('exp_details', 'details') || "None";
     const formattedDetails = details.split('\n').join('%0A');
 
-    const msg = `*JMD TRADERS - Daily Report*%0A` +
+    const msg = `*📊 JMD TRADERS - Daily Report*%0A` +
                 `*Date: ${getFormattedDate(selectedDate)}*%0A` +
                 `━━━━━━━━━━━━━━━━━━━%0A` +
-                `*SANKAT MOCHAN (S1)*%0A` +
+                `*💰 SANKAT MOCHAN (S1)*%0A` +
                 `*• Cash in Counter : ₹${s1_cl}*%0A` +
                 `*• To Home : ₹${s1_hm}*%0A` +
                 `*• GPay Sale : ₹${s1_gp}*%0A` +
                 `*• Today's Sale : ₹${s1TotalSale.toLocaleString()}*%0A%0A` +
-                `*JMD POOJA (S2)*%0A` +
+                `*💰 JMD POOJA (S2)*%0A` +
                 `*• Cash in Counter : ₹${s2_cl}*%0A` +
                 `*• To Home : ₹${s2_hm}*%0A` +
                 `*• GPay Sale : ₹${s2_gp}*%0A` +
@@ -1002,14 +1002,14 @@ window.onload = fetchSheetData;
                 `${formattedDetails}%0A%0A` +
                 `*• Home Exp : ₹${v('jeb_pay_out', 'jeb')}*%0A` +
                 `*• GPay Exp : ₹${v('gpay_exp', 'gpay_ex')}*%0A%0A` +
-                `*_TOTAL HISAAAB (For Today)_*%0A` +
+                `*_💵 TOTAL HISAAAB (For Today)_*%0A` +
                 `*_• Total Sale : ₹${totalSale.toLocaleString()}_*%0A` +
                 `*_• Cash Savings (40%) : ₹${cashSav.toLocaleString()}_*%0A` +
                 `*_• Bank Savings (40%) : ₹${bankSav.toLocaleString()}_*%0A` +
                 `*_• Net Cash (To Home) : ₹${netJeb.toLocaleString()}_*%0A` +
                 `_(Adjusted Amt from NetCash : ₹${short40})_%0A` +
                 `━━━━━━━━━━━━━━━━━━━%0A` +
-                `*Till Date Balance*%0A` +
+                `*💵 Till Date Balance*%0A` +
                 `> *• Net Bal (40% Cash) : ₹${finalTillC.toLocaleString()}*%0A` +
                 `> *• Net Bal (40% Bank) : ₹${finalTillB.toLocaleString()}*%0A` +
                 `> *• Net Bal (Cash at home) : ₹${finalTillN.toLocaleString()}*%0A` +
