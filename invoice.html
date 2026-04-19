@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMD Traders - Business Suite</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+:root { --wine: #4a0e0e; --text: #1e293b; --light: #f8fafc; }
+* { box-sizing: border-box; margin: 0; padding: 0; } /* Global Box Sizing */
+body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 20px; overflow-x: hidden; }
+/* Desktop Grid Layout */
+.app-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: auto;
+}
+.sidebar { display: flex; flex-direction: column; gap: 20px; }
+.main-container { display: flex; flex-direction: column; gap: 30px; width: 100%; min-width: 0; }
+.side-box, .invoice-card, .history-card {
+    background: white; border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 25px;
+}
+/* Header & Meta Grid Desktop */
+
+.logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--wine); }
+.details h1 { font-size: 22px; color: var(--wine); }
+.details p { font-size: 12px; color: #64748b; }
+.header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start; 
+    border-bottom: 2px solid #eee; 
+    padding-bottom: 20px; 
+    margin-bottom: 20px; 
+}
+
+.brand { display: flex; gap: 15px; flex: 1; }
+
+.header-meta-row { 
+    display: flex; 
+    gap: 10px; 
+    justify-content: flex-end; 
+    align-items: flex-end;
+}
+.header-meta-row .field { width: 140px; } /* Fixed width taaki Date aur Inv no ek line mein rahein */
+
+/* --- Bill Info Fix: Bill To, Payment Type, aur Amount ek line mein --- */
+.meta-grid { 
+    display: flex !important; 
+    flex-direction: row !important; 
+    gap: 15px; 
+    margin-bottom: 25px; 
+    align-items: flex-end; /* Labels ke sath sahi align karne ke liye */
+}
+
+/* Width Settings */
+.meta-grid .field:first-child { 
+    flex: 2; /* Customer Name wala box bada rahega */
+}
+
+.meta-grid .field:last-child { 
+    flex: 1; /* Contact No wala box thoda chota */
+}
+/* Item Table Desktop */
+.table-head { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr 40px; gap: 10px; background: var(--wine); color: white; padding: 12px; border-radius: 6px; font-size: 12px; }
+<!-- .item-row label { display: none; } -->
+input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; width: 100%; }
+.summary-box { float: right; width: 300px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .sum-line { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; align-items: center; }
+        .total-line { color: var(--wine); font-weight: 800; font-size: 18px; border-top: 1px solid #eee; padding-top: 10px; }
+
+@media (max-width: 768px) {
+    body { 
+        padding: 5px; 
+        margin: 0 !important;
+        background: #f1f5f9; /* Taki background color bana rahe */
+    }
+#toastr {
+        white-space: normal; 
+        min-width: 200px;
+    }
+    .app-layout { 
+        grid-template-columns: 1fr; 
+        gap: 0 !important; /* Sidebar aur Main container ke beech ka gap mobile pe khatam */
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 2. White Card (invoice-card) ko edges tak phailao */
+    .invoice-card, .history-card, .side-box {
+        border-radius: 12px /* Mobile par rounded corners ki jagah full width */
+        margin: 0 0 10px 0 !important; /* Sirf niche 10px ka gap rakha hai */
+        width: 100% !important;
+        box-shadow: none !important; /* Gaps hatane par shadow ajeeb lag sakti hai */
+        padding: 15px 10px !important; /* Box ke andar thoda sa gap zaroori hai */
+    }
+.side-box:nth-child(2) { 
+        display: none !important; 
+    }
+
+    /* Sidebar ko normal block banao taaki Summary top pe dikhe */
+    .sidebar {
+        display: block !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    /* Summary box ko thoda compact karo mobile ke liye */
+    .side-box:nth-child(1) {
+        margin-bottom: 10px !important;
+        padding: 15px !important;
+    }
+    /* 3. Header aur Meta Grid adjustment */
+    .header { 
+        padding-bottom: 15px !important; 
+    }
+    
+    .meta-grid {
+        margin-bottom: 15px !important;
+    }
+    .header { flex-direction: column !important; align-items: flex-start !important; }
+    .header-meta-row { width: 100%; justify-content: flex-start; margin-top: 15px; }
+    .header-meta-row .field { flex: 1; }
+    .meta-grid { gap: 5px; } /* Space kam kar di */
+    .meta-grid label { font-size: 9px; } /* Label chota kar diya */
+    .meta-grid input { 
+        font-size: 12px; 
+        padding: 8px 5px; 
+    }
+    /* Item Card Fix */
+    .table-head { display: none !important; }
+    .item-row { 
+        display: block !important; /* Stack rows vertically */
+        position: relative !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 8px !important;
+        margin-bottom: 8px !important;
+        background: #fff !important;
+    }
+
+    /* Row 1: Item Name (Full Width) */
+    .row-line-1 { 
+        width: 100% !important; 
+        margin-bottom: 10px !important;
+        padding-right: 25px !important; /* Space for X button */
+    }
+
+    /* Row 2: Qty, Rate, Amount (Teeno ek line mein) */
+    .row-line-2 { 
+        display: flex !important; 
+        flex-direction: row !important;
+        gap: 8px !important;
+        align-items: flex-end !important;
+    }
+    .row-line-2 div { 
+        flex: 1 !important; 
+    }
+
+    /* Delete Button: Top Right Corner */
+    .btn-rm { 
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        margin: 0 !important;
+        padding: 5px !important;
+        font-size: 20px !important;
+        color: #ef4444 !important;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    /* Labels chote aur saaf */
+    .item-row label { 
+        display: block !important; 
+        font-size: 10px !important; 
+        color: #64748b !important;
+        margin-bottom: 2px !important;
+    }
+    .item-row input { 
+        font-size: 13px !important; 
+        padding: 6px !important; 
+    }
+
+    /* History Scroll Fix */
+    .history-card { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 600px; }
+    
+    .summary-box { width: 100%; float: none; }
+}
+.button-row { 
+    display: flex; 
+    gap: 15px; 
+    margin-top: 30px; 
+}
+
+.btn-dl { 
+    flex: 1; /* Dono buttons barabar jagah lenge */
+    padding: 15px;
+    border: none;
+	background: #10b981;
+    border-radius: 8px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+@media (min-width: 769px) {
+    /* Header (Inv No & Date) ek line mein */
+    .header-meta-row {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+        align-items: center !important;
+    }
+    .header-meta-row .field {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px;
+        width: auto !important;
+    }
+    .header-meta-row label { margin-bottom: 0 !important; white-space: nowrap; }
+
+    /* Bill To aur Contact No ek line mein */
+    .meta-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+        align-items: flex-end !important;
+    }
+    .meta-grid .field { display: flex !important; flex-direction: column !important; }
+    .meta-grid .field:first-child { flex: 3 !important; } /* Bill To bada */
+    .meta-grid .field:last-child { flex: 1 !important; }  /* Contact chota */
+
+    /* Item Row Setup */
+    .item-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 10px 0 !important;
+        border-bottom: 1px solid #eee !important;
+    }
+    .item-row label { display: none !important; }
+    .row-line-1 { flex: 0 0 45% !important; padding-right: 15px !important; }
+    .row-line-2 { 
+        flex: 0 0 50% !important; 
+        display: flex !important; 
+        justify-content: space-between !important; 
+        align-items: center !important;
+    }.row-line-2 { 
+        flex: 0 0 50% !important; 
+        display: flex !important; 
+        flex-direction: row !important; /* Force horizontal layout */
+        justify-content: space-between !important; 
+        align-items: center !important;
+        gap: 15px !important; /* Yeh gap dono boxes ko alag rakhega */
+    }
+
+    /* Qty Box */
+    .row-line-2 div:nth-child(1) { 
+        flex: 1 !important; 
+    }
+
+    /* Rate Box */
+    .row-line-2 div:nth-child(2) { 
+        flex: 1 !important; 
+    }
+
+    /* Amount Box */
+    .row-line-2 div:nth-child(3) { 
+        flex: 1 !important; 
+        text-align: right !important;
+        padding-right: 10px;
+    }
+
+    /* Input boxes ki width bhi control mein rahegi */
+    .row-line-2 input {
+        width: 100% !important;
+    }
+    .btn-rm { flex: 0 0 5% !important; text-align: right; }
+}
+label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
+/* Save Bill ko specific green/blue color do */
+.btn-save { background-color: #2563eb !important; }
+.btn-pdf { background-color: #10b981 !important; }
+.quick-btn { width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; cursor: pointer; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; font-weight: 600; transition: 0.3s; }
+.quick-btn:hover { background: var(--wine); color: white; }
+.btn { padding: 12px 25px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.btn-add { background: #f1f5f9; color: var(--text); margin-top: 15px; width: 100%; }
+.btn-dl { background: #10b981; color: white; margin-top: 40px; width: 100%; font-size: 16px; }
+.btn-rm { font-size: 24px; color: #ef4444; background: none; border: none; cursor: pointer; }
+/* Suggestion Box Styling */
+#customSuggest div {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    background-color: white !important; /* Force white background */
+    color: #1e293b;
+    transition: all 0.1s ease;
+}
+
+/* 2. Hover Effect (For PC) */
+#customSuggest div:hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* 3. Click/Touch Feedback (For Mobile) */
+/* Isse tap karte hi color change hoga */
+#customSuggest div:active {
+    background-color: #cbd5e1 !important; 
+    transform: scale(0.97); /* Halkasa dabne ka effect */
+}
+
+#toastr {
+    position: fixed;
+    bottom: 15px; /* Thoda aur niche corner mein */
+    left: 50%;
+    transform: translateX(-50%);
+    padding:10px 20px; /* Padding kam kar di */
+    border-radius: 4px;
+    font-size: 0.85rem; /* Font size chhota kiya */
+    font-weight: 700;
+    z-index: 10000;
+    display: none;
+    width: max-content; /* Jitna bada text, utni width */
+    min-width: 280px;   /* Itna toh rahega hi */
+    max-width: 90%;    /* Mobile par screen se bahar na jaye */
+    text-align: center; /* Center mein text zyada clean lagta hai */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: opacity 0.3s ease;
+    border-left: 4px solid; /* Patli side patti */
+	white-space: nowrap;
+}
+
+/* Success - Slim Green */
+.toast-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-left: 4px solid #28a745;
+}
+
+/* Error - Slim Red */
+.toast-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid #dc3545;
+}
+
+/* Info - Slim Blue */
+.toast-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    border-left: 4px solid #17a2b8;
+}
+
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+</style>
+</head>
+        
+<body>
+    <div class="app-layout">
+    
+    <div class="sidebar">
+        <div class="side-box">
+            <h3 style="color:var(--wine); font-size:14px; border-bottom:1px solid #eee; padding-bottom:10px;">TODAY'S SUMMARY</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
+                <div>
+                    <label style="font-size:9px;">TOTAL SALES</label>
+                    <div id="dayTotal" style="font-size:18px; font-weight:800; color:#10b981;">₹0.00</div>
+                </div>
+                <div>
+                    <label style="font-size:9px;">BILLS</label>
+                    <div id="dayCount" style="font-size:18px; font-weight:800;">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-box">
+            <h3 style="color:var(--wine); font-size:14px; border-bottom:1px solid #eee; padding-bottom:10px;">FAST BILLING</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top:10px;">
+                <button class="quick-btn" onclick="quickAdd('Agarbatti', 50)">Agarbatti (₹50)</button>
+                <button class="quick-btn" onclick="quickAdd('Camphor', 20)">Camphor (₹20)</button>
+                <button class="quick-btn" onclick="quickAdd('Pooja Oil', 180)">Pooja Oil (₹180)</button>
+                <button class="quick-btn" onclick="quickAdd('Ghee', 160)">Ghee (₹160)</button>
+            </div>
+        </div>
+    </div>
+
+<div class="main-container">
+<div class="invoice-card">
+<div class="header">
+    <div class="brand">
+        <img id="logoImg" class="logo" src="https://i.postimg.cc/D0JzRh6x/download.png" crossorigin="anonymous">
+        <div class="details">
+            <h1>Jai Mata Di Pooja Bhandar</h1>
+            <p>Shop no.03, Gajanan Chowk, Dombivli East</p>
+            <p>Ph: 7738503902 | Since: 2021</p>
+        </div>
+    </div>
+    <div class="header-meta-row">
+        <div class="field">
+            <label>Inv No.</label>
+            <input type="text" id="invNo" value="JMD01267">
+        </div>
+        <div class="field">
+            <label>Date</label>
+            <input type="date" id="invDate">
+        </div>
+    </div>
+</div>
+
+    <div class="meta-grid">
+    <div class="field">
+        <label>Bill To</label>
+        <input type="text" id="billTo" placeholder="Customer Name">
+    </div>
+        <div class="field">
+            <label>Contact No</label>
+            <input type="text" id="payMode" placeholder="Enter Number">
+        </div>
+    </div>
+
+    <div class="table-head">
+        <div>ITEM DESCRIPTION</div>
+        <div>QTY</div>
+        <div>RATE</div>
+        <div style="text-align:right">AMOUNT</div>
+        <div></div>
+    </div>
+	<div id="customSuggest" style="display:none; position:absolute; background:white; border:1px solid #ccc; z-index:1000; box-shadow:0 4px 8px rgba(0,0,0,0.1); width:200px; border-radius:8px; overflow:hidden;"></div>
+    <div id="itemsContainer"></div>
+    <button class="btn btn-add" onclick="addItem()">+ Add Item</button>
+
+    <div class="summary-box">
+        <div class="sum-line"><span>Subtotal</span><span id="subTotal">0.00</span></div>
+        <div class="sum-line"><span>Discount (%)</span><input type="number" id="overallDisc" value="0" oninput="calc()" style="width: 50px; text-align: right;"></div>
+        <div class="sum-line"><span>GST (%)</span><input type="number" id="overallGst" value="0" oninput="calc()" style="width: 50px; text-align: right;"></div>
+        <div class="sum-line" style="display:none;"><span>Tax Amt</span><span id="taxTotal">0.00</span></div>
+        <div class="total-line sum-line"><span>Total</span><span id="grandTotal">0.00</span></div>
+        <div class="sum-line" style="margin-top: 10px; color: red; font-weight:700;"><span>Balance Due</span><span id="balDue">0.00</span></div>
+    </div>
+    <div style="clear: both;"></div>
+        <div class="button-row">
+<button class="btn btn-dl" style="background-color:blue" onclick="saveBillToHistory()" >
+    Save Bill 
+</button>
+    <button class="btn btn-dl" onclick="saveVyaparPDF()">Download PDF</button>
+</div>
+</div><div id="toastr"></div>
+<div class="history-card">
+            <h3 style="color:var(--wine); font-size:16px; border-bottom:2px solid var(--wine); margin-bottom:15px;">RECENT TRANSACTIONS</h3>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead style="background:#f1f5f9;">
+                    <tr>
+                        <th style="padding:10px; text-align:left;">Date</th>
+                        <th style="padding:10px; text-align:left;">Bill No.</th>
+                        <th style="padding:10px; text-align:left;">Customer</th>
+                        <th style="padding:10px; text-align:right;">Amount</th>
+                        <th style="padding:10px; text-align:right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="billHistoryBody">
+                    </tbody>
+            </table>
+        </div>
+		</div>
+		</div>
+<script>
+    function addItem(name = '', rate = 0) {
+    const container = document.getElementById('itemsContainer');
+    const row = document.createElement('div');
+    row.className = 'item-row';
+
+    row.innerHTML = `
+        <div class="row-line-1">
+            <div>
+                <label>Item Name</label>
+               <input type="text" class="i-n" list="itemList" placeholder="Item name..." value="${name}" oninput="autoFillPrice(this)">
+            </div>
+        </div>
+
+        <div class="row-line-2">
+            <div>
+                <label>Qty</label>
+                <input type="number" class="i-q" value="1" oninput="calc()">
+            </div>
+            <div>
+                <label>Rate</label>
+                <input type="number" class="i-r" value="${rate}" oninput="calc()">
+            </div>
+            <div>
+                <label>Amount</label>
+                <div style="font-weight:800; color:var(--wine); padding-top: 5px; font-size:14px;">
+                    ₹<span class="i-a">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-rm" onclick="this.parentElement.remove(); calc();">&times;</button>
+    `;
+    container.appendChild(row);
+    calc();
+}const myItems = [
+    { name: "Agarbatti", price: 50 },
+    { name: "Camphor", price: 20 },
+    { name: "Pooja Oil", price: 180 },
+    { name: "Ghee", price: 160 }
+];
+
+function autoFillPrice(input) {
+    const val = input.value.toLowerCase();
+    const suggestBox = document.getElementById('customSuggest');
+    
+    if (val.length < 2) {
+        suggestBox.style.display = 'none';
+        return;
+    }
+
+    const matches = myItems.filter(item => item.name.toLowerCase().startsWith(val));
+
+    if (matches.length > 0) {
+        const rect = input.getBoundingClientRect();
+        suggestBox.style.left = rect.left + 'px';
+        suggestBox.style.top = (rect.bottom + window.scrollY) + 'px';
+        suggestBox.style.width = rect.width + 'px';
+        suggestBox.style.display = 'block';
+
+        // CHANGE: onclick ko hatakar onmousedown lagaya hai
+		suggestBox.innerHTML = matches.map(item => `
+    <div onmousedown="selectItem('${item.name}', ${item.price})">
+        ${item.name} <span style="float:right; color:#888;">₹${item.price}</span>
+    </div>
+`).join('');
+    } else {
+        suggestBox.style.display = 'none';
+    }
+}
+function showToast(message, type = 'success') {
+    const toast = document.getElementById("toastr");
+    if (!toast) return; // Agar HTML bhul gaye toh error nahi aayega
+
+    let icon = "";
+    if (type === 'success') icon = "✅ ";
+    if (type === 'error') icon = "❌ ";
+    if (type === 'info') icon = "ℹ️ ";
+
+    toast.className = '';
+    toast.classList.add('toast-' + type);
+    
+    // Ek hi line mein Title aur Message
+    toast.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${icon}${message}`;
+    
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+    }, 3000);
+}
+function selectItem(name, price) {
+    // Jo input abhi focus mein hai use pakdo
+    const activeInput = document.activeElement; 
+    if (activeInput && activeInput.classList.contains('i-n')) {
+        activeInput.value = name;
+        const row = activeInput.closest('.item-row');
+        row.querySelector('.i-r').value = price;
+        
+        // Suggestion box band karo
+        document.getElementById('customSuggest').style.display = 'none';
+        showToast(`${name} Added!`, "success");
+        // Calculation update karo
+        calc();
+    }
+}
+
+// Focus hatne par box band ho jaye (Lekin mousedown ke baad)
+document.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('i-n')) {
+        document.getElementById('customSuggest').style.display = 'none';
+    }
+});
+function quickAdd(name, rate) {
+    // Check karo agar item pehle se bill mein hai toh sirf quantity badhao
+    let found = false;
+    document.querySelectorAll('.item-row').forEach(row => {
+        if (row.querySelector('.i-n').value === name) {
+            let qInput = row.querySelector('.i-q');
+            qInput.value = parseInt(qInput.value) + 1;
+            found = true;
+        }
+    });
+
+    // Agar naya item hai toh addItem call karo
+    if (!found) {
+        addItem(name, rate);
+    }
+    calc(); // Sab calculate kar lo
+}
+// 1. Dashboard aur Table dono load karo
+function saveBillToHistory() {
+    const amount = parseFloat(document.getElementById('grandTotal').innerText) || 0;
+    if (amount <= 0) return showToast("Khali bill save nahi hota bhai!", "error");
+
+    // Bill data collect karo
+    const history = JSON.parse(localStorage.getItem('jmd_bill_history')) || [];
+    const summary = JSON.parse(localStorage.getItem('jmd_sales_summary')) || { total: 0, count: 0 };
+
+    const newBill = {
+        id: document.getElementById('invNo').value,
+        customer: document.getElementById('billTo').value || "Unknown",
+		number: document.getElementById('payMode').value,
+        amount: amount.toFixed(2),
+        date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        items: [] // Items list yahan store kar sakte ho
+    };
+
+    // Unshift matlab naya bill sabse upar
+    history.unshift(newBill);
+    if(history.length > 20) history.pop();
+
+    summary.total += amount;
+    summary.count += 1;
+
+    // Save to memory
+    localStorage.setItem('jmd_bill_history', JSON.stringify(history));
+    localStorage.setItem('jmd_sales_summary', JSON.stringify(summary));
+
+    // REFRESH TABLE
+    loadDailySales();
+    showToast("Transaction Saved!", "success");
+}
+// 2. Table mein 'View' button add karo
+function loadDailySales() {
+    // 1. Data uthao
+    const history = JSON.parse(localStorage.getItem('jmd_bill_history')) || [];
+    const summary = JSON.parse(localStorage.getItem('jmd_sales_summary')) || { total: 0, count: 0 };
+    
+    console.log("History Data Found:", history); // Debugging ke liye
+
+    // 2. Dashboard (Galla) update karo
+    const dayTotal = document.getElementById('dayTotal');
+    const dayCount = document.getElementById('dayCount');
+    if(dayTotal) dayTotal.innerText = "₹" + summary.total.toFixed(2);
+    if(dayCount) dayCount.innerText = summary.count;
+
+    // 3. Table update karo
+    const tbody = document.getElementById('billHistoryBody');
+    if(!tbody) return;
+
+    if(history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">No Transactions Yet</td></tr>';
+        return;
+    }
+
+    // 4. Data display logic
+    tbody.innerHTML = history.map((bill, index) => `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px;">${bill.date}</td>
+            <td style="padding: 10px; font-weight: 600;">${bill.id}</td>
+            <td style="padding: 10px;">${bill.customer || 'Cash'}</td>
+            <td style="padding: 10px; text-align: right; font-weight: 700;">₹${bill.amount}</td>
+            <td style="padding: 10px; text-align: right;">
+                <button onclick="viewBill(${index})" style="background:var(--wine); color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px;">View</button>
+            </td>
+        </tr>
+    `).join('');
+}
+function deleteBill(index) {
+    if(!confirm("Kya aap ye bill delete karna chahte hain? Isse total kam ho jayega.")) return;
+
+    let history = JSON.parse(localStorage.getItem('jmd_bill_history')) || [];
+    let summary = JSON.parse(localStorage.getItem('jmd_sales_summary')) || { total: 0, count: 0 };
+
+    // 1. Summary se amount minus karo
+    const billAmount = parseFloat(history[index].amount);
+    summary.total -= billAmount;
+    summary.count -= 1;
+
+    // 2. History se bill remove karo
+    history.splice(index, 1);
+
+    // 3. Wapas save karo
+    localStorage.setItem('jmd_bill_history', JSON.stringify(history));
+    localStorage.setItem('jmd_sales_summary', JSON.stringify(summary));
+
+    // 4. UI update karo
+    loadDailySales();
+}
+// 3. Purana bill editor mein load karne ka function
+function viewBill(index) {
+    const history = JSON.parse(localStorage.getItem('jmd_bill_history')) || [];
+    const bill = history[index];
+    if(!bill) return;
+
+    // Header info set karo
+    document.getElementById('invNo').value = bill.id;
+    document.getElementById('billTo').value = bill.customer;
+	document.getElementById('payMode').value = bill.number;
+    document.getElementById('overallGst').value = bill.tax || 0;
+    document.getElementById('overallDisc').value = bill.disc || 0;
+
+    // Purane items clear karo
+    document.getElementById('itemsContainer').innerHTML = "";
+
+    // Bill ke items wapas load karo
+    bill.items.forEach(item => {
+        addItem(item.name, item.rate);
+        // Latest row ki quantity set karo
+        let rows = document.querySelectorAll('.item-row');
+        rows[rows.length - 1].querySelector('.i-q').value = item.qty;
+    });
+
+    calc();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 3. Reset function update
+function resetDailySales() {
+    if(confirm("Full history clear karun?")) {
+        localStorage.removeItem('jmd_bill_history');
+        localStorage.removeItem('jmd_sales_summary');
+        loadDailySales();
+    }
+}
+    function calc() {
+        let subtotal = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+            const q = parseFloat(row.querySelector('.i-q').value) || 0;
+            const r = parseFloat(row.querySelector('.i-r').value) || 0;
+            const amt = q * r;
+            row.querySelector('.i-a').innerText = amt.toFixed(2);
+            subtotal += amt;
+        });
+
+        const discPercent = parseFloat(document.getElementById('overallDisc').value) || 0;
+        const gstPercent = parseFloat(document.getElementById('overallGst').value) || 0;
+
+        const discAmt = subtotal * (discPercent / 100);
+        const afterDisc = subtotal - discAmt;
+        const taxAmt = afterDisc * (gstPercent / 100);
+        const grandTotal = afterDisc + taxAmt;
+        const balance = grandTotal;
+
+        document.getElementById('subTotal').innerText = subtotal.toFixed(2);
+        document.getElementById('taxTotal').innerText = taxAmt.toFixed(2);
+        document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
+        document.getElementById('balDue').innerText = balance.toFixed(2);
+    }
+// 1. Page load hote hi purana data dikhao
+
+    async function saveVyaparPDF() {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const logo = document.getElementById('logoImg');
+            if(logo) doc.addImage(logo, 'PNG', 14, 15, 22, 22);
+            
+            doc.setFontSize(16); doc.setTextColor(74, 14, 14); 
+            doc.text("Jai Mata Di Pooja Bhandar", 40, 22);
+            doc.setFontSize(8); doc.setTextColor(100);
+            doc.text("Shop no.03, Gajanan Chowk, Dombivli East", 40, 27);
+            doc.text("Ph: 7738503902 | Since: 2021", 40, 31);
+            
+            doc.setFontSize(22); doc.setTextColor(0); doc.text("INVOICE", 150, 25);
+            doc.setFontSize(9); doc.text(`# ${document.getElementById('invNo').value}`, 150, 32);
+
+            const rows = [];
+            document.querySelectorAll('.item-row').forEach(r => {
+                rows.push([
+                    r.querySelector('.i-n').value, 
+                    r.querySelector('.i-q').value, 
+                    r.querySelector('.i-r').value, 
+                    r.querySelector('.i-a').innerText
+                ]);
+            });
+
+            doc.autoTable({
+                startY: 50,
+                head: [['ITEM', 'QTY', 'RATE', 'AMOUNT']],
+                body: rows,
+                headStyles: { fillColor: [74, 14, 14] },
+                theme: 'striped'
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(10); doc.setTextColor(100);
+            doc.text("Subtotal:", 140, finalY); doc.text(document.getElementById('subTotal').innerText, 190, finalY, {align:'right'});
+            
+            const discVal = document.getElementById('overallDisc').value || 0;
+            doc.text(`Discount (${discVal}%):`, 140, finalY + 6);
+            doc.text("-" + (parseFloat(document.getElementById('subTotal').innerText) * discVal / 100).toFixed(2), 190, finalY + 6, {align:'right'});
+
+            doc.text("Tax Amount:", 140, finalY + 12); doc.text(document.getElementById('taxTotal').innerText, 190, finalY + 12, {align:'right'});
+            
+            doc.setFontSize(14); doc.setTextColor(74, 14, 14); doc.setFont("helvetica", "bold");
+            doc.text("Total:", 140, finalY + 22); doc.text("Rs. " + document.getElementById('grandTotal').innerText, 190, finalY + 22, {align:'right'});
+
+            doc.setFontSize(10); doc.setTextColor(255, 0, 0);
+            doc.text("Balance Due:", 140, finalY + 30); doc.text("Rs. " + document.getElementById('balDue').innerText, 190, finalY + 30, {align:'right'});
+
+            doc.setFontSize(8); doc.setTextColor(150); doc.setFont("helvetica", "normal");
+            doc.text("Terms: Goods once sold will not be taken back.", 14, finalY + 50);
+            doc.text("This is a computer generated invoice.", 14, finalY + 54);
+
+            doc.save(`Invoice_${document.getElementById('invNo').value}.pdf`);
+        } catch(e) {
+            alert("Error: " + e.message);
+        }
+    }
+
+    window.onload = () => { 
+        loadDailySales(); // Page khulte hi history load karega
+    addItem();
+	document.getElementById('invDate').valueAsDate = new Date(); 
+    };
+</script>
+</body>
+</html>
