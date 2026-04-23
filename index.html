@@ -13,16 +13,42 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #0d0e12; --card: #1a1b1f; --primary: #f1c40f; --secondary: #2ecc71; --error: #e74c3c; --info: #3498db; --text: #f5f6fa; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-        .app-container { max-width: 1200px; margin: auto; }
-        .header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--primary); margin-bottom: 15px; }
-        .header h1 { margin: 0; color: var(--primary); font-size: 1.3rem; letter-spacing: 1px; }
+        :root { 
+    --bg: #1a0202; /* Wine match */
+    --card: #1a1b1f; 
+    --primary: #f1c40f; 
+    --secondary: #2ecc71; 
+    --error: #e74c3c; 
+    --info: #3498db; 
+    --text: #f5f6fa; 
+}
 
-        .analytics-toggle { width: 100%; padding: 12px; background: #25262b; border: 1px solid #333; border-radius: 12px; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .analytics-content { display: none; margin-bottom: 20px; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .filter-bar {
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    /* Ye background ab tere login page se match karega */
+    background: radial-gradient(circle at center, #4a0e0e 0%, #0d0d0d 100%);
+    background-attachment: fixed;
+    color: var(--text); 
+    margin: 0; 
+    padding: 15px; 
+}
+
+.app-container { max-width: 1200px; margin: auto; }
+
+.header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--primary); margin-bottom: 15px; }
+
+.header h1 { margin: 0; color: var(--primary); font-size: 1.3rem; letter-spacing: 1px; }
+
+.analytics-toggle { 
+    width: 100%; padding: 12px; background: #25262b; border: 1px solid #333; 
+    border-radius: 12px; color: var(--primary); font-weight: bold; 
+    cursor: pointer; margin-bottom: 10px; display: flex; 
+    justify-content: space-between; align-items: center; 
+}
+
+.analytics-content { display: none; margin-bottom: 20px; animation: slideDown 0.3s ease-out; }@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.filter-bar {
     background: #1a1a1a;
     padding: 15px;
     border: 1px solid #444;
@@ -461,10 +487,122 @@
         .breakdown-box { font-size: 0.65rem; color: #888; margin-top: 5px; border-top: 1px solid #333; padding-top: 5px; line-height: 1.4; }
 
         @media (max-width: 600px) { .actions { grid-template-columns: 1fr; } }
-    </style>
+#loginPage {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Background gradient with a subtle pulse */
+        background: radial-gradient(circle at center, #4a0e0e 0%, #1a0202 100%);
+        font-family: 'Segoe UI', sans-serif;
+        overflow: hidden;
+    }
+
+    .login-box {
+        background: rgba(43, 5, 5, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 40px;
+        border-radius: 35px;
+        border: 1px solid rgba(241, 196, 15, 0.4); 
+        width: 100%;
+        max-width: 340px;
+        text-align: center;
+        box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 30px rgba(241, 196, 15, 0.15);
+        position: relative;
+        overflow: hidden; /* Shine ko box ke andar rakhne ke liye */
+    }
+
+    /* ✨ FIXED SHINE (Shaing) */
+    .login-box::after {
+        content: '';
+        position: absolute;
+        top: -150%; left: -150%; width: 300%; height: 300%;
+        background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.08), transparent);
+        transform: rotate(45deg);
+        animation: shineFlow 6s infinite linear;
+        
+        /* 🛡️ CRITICAL FIX: Taaki ye clicks ko block na kare */
+        pointer-events: none; 
+        z-index: 10;
+    }
+
+    @keyframes shineFlow {
+        0% { transform: translate(-30%, -30%) rotate(45deg); }
+        100% { transform: translate(30%, 30%) rotate(45deg); }
+    }
+
+    /* Logo Container */
+    .logo-container {
+        width: 100px; height: 100px; margin: 0 auto 25px;
+        background: #4e0707; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid #f1c40f; box-shadow: 0 0 25px rgba(241, 196, 15, 0.5);
+        overflow: hidden;
+        position: relative;
+        z-index: 20; /* Z-index high rakha hai taaki hamesha upar dikhe */
+    }
+
+    .logo-container img { width: 90%; height: 90%; object-fit: contain; }
+
+    .input-field {
+        width: 100%; padding: 15px; margin-bottom: 15px;
+        border-radius: 15px; border: 1px solid rgba(241, 196, 15, 0.2);
+        background: rgba(0, 0, 0, 0.5); color: white; outline: none; box-sizing: border-box;
+        position: relative; z-index: 20; /* Taaki click hamesha ho sake */
+        font-size: 16px;
+    }
+
+    #adminUser { text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+
+    .pass-wrapper { position: relative; z-index: 20; }
+    .eye-btn { position: absolute; right: 15px; top: 15px; cursor: pointer; color: #f1c40f; opacity: 0.7; font-size: 18px; }
+
+    .login-btn {
+        width: 100%; padding: 16px;
+        background: linear-gradient(135deg, #f1c40f 0%, #b8860b 100%);
+        border: none; border-radius: 15px; font-weight: 900;
+        cursor: pointer; color: #2b0505; font-size: 16px; text-transform: uppercase;
+        position: relative; z-index: 25;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        transition: transform 0.2s;
+    }
+
+    .login-btn:active { transform: scale(0.97); }
+
+    /* Shake Effect for error */
+    @keyframes shakeEffect {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+</style>
 </head>
 <body>
+  <div id="loginPage">
+        <div class="login-box" id="loginCard">
+            <div class="logo-container">
+                <img src="https://i.postimg.cc/D0JzRh6x/download.png" alt="JMD Logo">
+            </div>
 
+            <h2 style="color: #f1c40f; letter-spacing: 3px; margin: 0;">JMD TRADERS</h2>
+            <p style="color: rgba(241, 196, 15, 0.6); font-size: 10px; margin-bottom: 30px;">SECURE ACCESS</p>
+
+            <input type="text" id="adminUser" class="input-field" placeholder="USER ID" oninput="this.value = this.value.toUpperCase()">
+            
+            <div class="pass-wrapper">
+                <input type="password" id="adminPass" class="input-field" placeholder="PASSCODE">
+                <span class="eye-btn" onclick="togglePass()">👁️</span>
+            </div>
+
+            <button onclick="handleLogin()" class="login-btn">Log In 🔑</button>
+
+            <p id="errorMsg" style="color: #ff4d4d; margin-top: 20px; font-size: 13px; display: none; font-weight: bold;">
+                🚫 Invalid ID or Password!
+            </p>
+        </div>
+    </div>
+  <div id="mainApp" style="display: none;">
 <div class="app-container">
     <div class="header"><h1>JMD TRADERS</h1></div>
 
@@ -630,16 +768,49 @@
         <button id="toastConfirmBtn" class="btn-yes">Haan</button>
     </div>
 </div>
-</div>
 <div id="toastr"></div>
+</div>
+</div>
 <script>
-    const dateIn = document.getElementById('entryDate');
+function togglePass() {
+            const p = document.getElementById('adminPass');
+            p.type = p.type === "password" ? "text" : "password";
+        }
+
+        function handleLogin() {
+            const u = document.getElementById('adminUser').value.trim().toUpperCase();
+            const p = document.getElementById('adminPass').value.trim();
+            const err = document.getElementById('errorMsg');
+            const card = document.getElementById('loginCard');
+
+            const sU = "Sk1E"; 
+            const sP = "MTcwNw==";
+
+            if (btoa(u) === sU && btoa(p) === sP) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                sessionStorage.setItem('jmd_session_active', 'true'); 
+            } else {
+                err.style.display = 'block';
+                card.style.animation = "shakeEffect 0.4s ease-in-out";
+                setTimeout(() => { card.style.animation = ""; }, 400);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('jmd_session_active') === 'true') {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+            }
+        });
+		
+const dateIn = document.getElementById('entryDate');
     const today = new Date().toISOString().split('T')[0];
     dateIn.value = today;
     dateIn.max = today; 
 	let history = JSON.parse(localStorage.getItem('jmd_traders_v5')) || [];
     let myChart;
-	const FINAL_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTj99kd1_OEiPSTO6Kt-h1Nm4Nb3qiC-BvJQBnEaai5Z3GKoQZyG4MFtlVww5oN68DMw/exec';
+	const FINAL_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAndHg7Tmk6zxU72WwP5JtIlgfImkWVQlNHFY2J0cMXRcrkJkfgxKtpI2ro_82lu9rKw/exec';
     function toggleAnalytics() {
         const section = document.getElementById('analyticsSection');
         const icon = document.getElementById('toggleIcon');
@@ -985,15 +1156,15 @@ window.onload = fetchSheetData;
     const details = t('exp_details', 'details') || "None";
     const formattedDetails = details.split('\n').join('%0A');
 
-    const msg = `*📊 JMD TRADERS - Daily Report*%0A` +
+    const msg = `*JMD TRADERS - Daily Report*%0A` +
                 `*Date: ${getFormattedDate(selectedDate)}*%0A` +
                 `━━━━━━━━━━━━━━━━━━━%0A` +
-                `*💰 SANKAT MOCHAN (S1)*%0A` +
+                `*SANKAT MOCHAN (S1)*%0A` +
                 `*• Cash in Counter : ₹${s1_cl}*%0A` +
                 `*• To Home : ₹${s1_hm}*%0A` +
                 `*• GPay Sale : ₹${s1_gp}*%0A` +
                 `*• Today's Sale : ₹${s1TotalSale.toLocaleString()}*%0A%0A` +
-                `*💰 JMD POOJA (S2)*%0A` +
+                `*JMD POOJA (S2)*%0A` +
                 `*• Cash in Counter : ₹${s2_cl}*%0A` +
                 `*• To Home : ₹${s2_hm}*%0A` +
                 `*• GPay Sale : ₹${s2_gp}*%0A` +
@@ -1002,14 +1173,14 @@ window.onload = fetchSheetData;
                 `${formattedDetails}%0A%0A` +
                 `*• Home Exp : ₹${v('jeb_pay_out', 'jeb')}*%0A` +
                 `*• GPay Exp : ₹${v('gpay_exp', 'gpay_ex')}*%0A%0A` +
-                `*_💵 TOTAL HISAAAB (For Today)_*%0A` +
+                `*_TOTAL HISAAAB (For Today)_*%0A` +
                 `*_• Total Sale : ₹${totalSale.toLocaleString()}_*%0A` +
                 `*_• Cash Savings (40%) : ₹${cashSav.toLocaleString()}_*%0A` +
                 `*_• Bank Savings (40%) : ₹${bankSav.toLocaleString()}_*%0A` +
                 `*_• Net Cash (To Home) : ₹${netJeb.toLocaleString()}_*%0A` +
                 `_(Adjusted Amt from NetCash : ₹${short40})_%0A` +
                 `━━━━━━━━━━━━━━━━━━━%0A` +
-                `*💵 Till Date Balance*%0A` +
+                `*Till Date Balance*%0A` +
                 `> *• Net Bal (40% Cash) : ₹${finalTillC.toLocaleString()}*%0A` +
                 `> *• Net Bal (40% Bank) : ₹${finalTillB.toLocaleString()}*%0A` +
                 `> *• Net Bal (Cash at home) : ₹${finalTillN.toLocaleString()}*%0A` +
@@ -1504,8 +1675,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateLiveDash();
     console.log("JMD App Ready! Opening Cash & Dash Updated.");
 });
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    showToast("Bhai, yahan right click allow nahi hai! 🍷", "info");
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === "F12") {
+        e.preventDefault();
+        return false;
+    }
 
-// Backup trigger for dashboard
+    if (e.ctrlKey && (e.shiftKey && (e.key === 'I' || e.key === 'J') || e.key === 'u' || e.key === 's')) {
+        e.preventDefault();
+        return false;
+    }
+});
 window.addEventListener('load', updateLiveDash);
 </script>
 </body>
