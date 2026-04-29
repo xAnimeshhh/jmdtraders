@@ -1,6 +1,18 @@
+// 1. Install hote hi purane worker ko hatao
+self.addEventListener('install', (event) => {
+    self.skipWaiting(); 
+    console.log('SW: Installing...');
+});
+
+// 2. Turant control le lo taaki app install ho sake
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
+    console.log('SW: Activated!');
+});
+
+// Baaki tera puraana code niche...
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
-    // Notification click karte hi seedha tere billing page pe le jayega
     event.waitUntil(clients.openWindow('https://xanimeshhh.github.io/jmdtraders/invoice.html'));
 });
 
