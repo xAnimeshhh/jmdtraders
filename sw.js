@@ -5,7 +5,8 @@ const urlsToCache = [
   "./",
   "./invoice.html",
   "./dashboard.html",
-  "https://i.postimg.cc/D0JzRh6x/download.png"
+  "https://i.postimg.cc/D0JzRh6x/download.png",
+  "https://i.postimg.cc/htQppn1q/jmd-app.png"
 ];
 
 // 1. INSTALL: Files save karna aur purane worker ko hatana
@@ -44,7 +45,7 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('push', function(event) {
     const options = {
         body: 'JMD Traders: Naya Bill Generate Hua Hai!',
-        icon: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        icon: 'https://i.postimg.cc/htQppn1q/jmd-app.png',
         badge: 'https://i.postimg.cc/D0JzRh6x/download.png',
         vibrate: [200, 100, 200]
     };
