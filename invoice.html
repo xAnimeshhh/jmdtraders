@@ -2027,7 +2027,8 @@ function toSentenceCase(str) {
     }).join(' ');
 }
 function triggerBillNotification() {
-  if (Notification.permission === 'granted') {
+  console.log("Attempting to show notification...");
+	if (Notification.permission === 'granted') {
     navigator.serviceWorker.ready.then(registration => {
       registration.showNotification('JMD Traders Alert', {
         body: 'Naya Bill Generate Hua Hai!',
