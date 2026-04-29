@@ -1,11 +1,16 @@
 {
   "name": "JMD Traders Business Suite",
-  "short_name": "JMD Traders",
-  "start_url": "invoice.html",
+  "short_name": "JMD",
+  "start_url": "/jmdtraders/invoice.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "icons": [
+    {
+      "src": "https://i.postimg.cc/D0JzRh6x/download.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
       "src": "https://i.postimg.cc/D0JzRh6x/download.png",
       "sizes": "512x512",
