@@ -3530,7 +3530,7 @@ const messaging = firebase.messaging();
 
 // Token mangne aur Service Worker register karne ka sahi logic
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/jmdtraders/firebase-messaging-sw.js')
+    navigator.serviceWorker.register('./firebase-messaging-sw.js?v=' + Date.now())
     .then((registration) => {
         console.log('Service Worker Manual Registration Successful!');
 
