@@ -10,6 +10,8 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
 	<link rel="manifest" href="/jmdtraders/manifest.json">
 	<meta name="theme-color" content="#850026">
     <style>
@@ -2029,26 +2031,27 @@ function toSentenceCase(str) {
 }
 function triggerBillNotification() {
   console.log("Attempting to show notification...");
-	if (Notification.permission === 'granted') {
+  
+  if (Notification.permission === 'granted') {
     navigator.serviceWorker.ready.then(registration => {
       registration.showNotification('JMD Traders Alert', {
-        body: 'Naya Bill Generate Hua Hai!',
+        body: 'Naya Bill Generate Hua Hai! ✅',
         icon: 'https://i.postimg.cc/htQppn1q/jmd-app.png',
         badge: 'https://i.postimg.cc/nhcgGrdj/jmdbadge.png',
         vibrate: [200, 100, 200],
-        tag: 'bill-save', // Isse duplicate notifications nahi aayenge]
-        data: { url: './dashboard.html' }
+        tag: 'bill-save', 
+        renotify: true, // Naye bill par phir se vibrate karega
+        data: { url: 'https://xanimeshhh.github.io/jmdtraders/dashboard.html' }
       });
     });
-  }else if (Notification.permission !== 'denied') {
+  } else if (Notification.permission !== 'denied') {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
-        triggerBillNotification(); // Dubara try karo
+        triggerBillNotification();
       }
     });
   }
 }
-
 async function saveBillToHistory() {
     const dashboardDays = parseInt(document.getElementById('totalDays')?.value || '1', 10) || 1;
     const address = document.getElementById('custAddress')?.value.trim() || "";
@@ -3510,52 +3513,55 @@ function updateSecurityDeposit() {
 
     return finalDepositAmt; // Yeh value calc() ko wapas jayegi
 }
+// Firebase Setup
+const firebaseConfig = {
+  apiKey: "AIzaSyCtXaYpbyg4A4rmj_27N4mUtE_IssWPCZM",
+  authDomain: "jmd-traders.firebaseapp.com",
+  projectId: "jmd-traders",
+  storageBucket: "jmd-traders.firebasestorage.app",
+  messagingSenderId: "799017023327",
+  appId: "1:799017023327:web:316a19b47283eb5b4c28ea"
+};
+
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      // Versioning se naya notification code turant load hoga
-      navigator.serviceWorker.register('./sw.js?v=2.0')
-        .then(reg => {
-          console.log('JMD App Ready!');
-          
-          // Permission mangne ka logic
-          if (Notification.permission === 'default') {
-            Notification.requestPermission().then(permission => {
-              if (permission === 'granted') {
-                console.log('Notification allowed!');
-              }
-            });
-          }
+  window.addEventListener('load', () => {
+    // Version v3 isliye taaki naya Firebase wala sw.js load ho
+    navigator.serviceWorker.register('./sw.js?v=3.0')
+      .then(reg => {
+        console.log('JMD App Ready with Firebase!');
+        
+        // Firebase ko batana ki is worker ko use kare
+        messaging.getToken({ 
+          serviceWorkerRegistration: reg,
+          vapidKey: "BIGw5CONpp1JTTf-hVzvLlEUJWRlM_NrqmngmSiMGkY4DrqJw-QehOMmFy-3J6rrs2-VJBdH6Z2ZO_-GJr3Bd6g" 
         })
-        .catch(err => console.log('Registration failed:', err));
+        .then((currentToken) => {
+          if (currentToken) {
+            console.log("Tera Unique Token (Address):", currentToken);
+            // Is token ko sambhal ke rakhna, yahi phone ka address hai
+          } else {
+            console.log('Permission mangni padegi bhai.');
+          }
+        }).catch((err) => console.log('Token error:', err));
+      })
+      .catch(err => console.log('Registration failed:', err));
+  });
+}
+
+// Tera Refresh function (Sahi hai, isse rehne de)
+function refreshApp() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+      window.location.reload();
     });
   }
-
-  // Testing ke liye: Ye function call karne par notification dikhega
-  function testNotification() {
-    if (Notification.permission === 'granted') {
-      navigator.serviceWorker.ready.then(registration => {
-        registration.showNotification('JMD Traders', {
-          body: 'Bhai, notification chal raha hai!',
-          icon: 'https://i.postimg.cc/D0JzRh6x/download.png'
-        });
-      });
-    } else {
-      alert("Pehle notification allow karo settings mein!");
-    }
-  }
-
-  // Ek naya function add kar de jo cache clear karne mein help karega agar kabhi app fase toh
-  function refreshApp() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        for (let registration of registrations) {
-          registration.unregister();
-        }
-        window.location.reload();
-      });
-    }
-  }
-  
+}
 </script>
 
 </body>
