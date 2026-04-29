@@ -2033,8 +2033,8 @@ function triggerBillNotification() {
     navigator.serviceWorker.ready.then(registration => {
       registration.showNotification('JMD Traders Alert', {
         body: 'Naya Bill Generate Hua Hai!',
-        icon: 'https://i.postimg.cc/D0JzRh6x/download.png',
-        badge: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        icon: 'https://i.postimg.cc/htQppn1q/jmd-app.png',
+        badge: 'https://i.postimg.cc/nhcgGrdj/jmdbadge.png',
         vibrate: [200, 100, 200],
         tag: 'bill-save', // Isse duplicate notifications nahi aayenge]
         data: { url: './dashboard.html' }
@@ -2240,8 +2240,8 @@ function triggerDailySummary(message) {
     navigator.serviceWorker.ready.then(reg => {
       reg.showNotification('JMD Traders: Morning Report 📊', {
         body: message + '. Click karke poori list dekhein!',
-        icon: 'https://i.postimg.cc/D0JzRh6x/download.png',
-        badge: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        icon: 'https://i.postimg.cc/htQppn1q/jmd-app.png',
+        badge: 'https://i.postimg.cc/nhcgGrdj/jmdbadge.png',
         tag: 'daily-summary', // Isse purana summary update ho jayega
         vibrate: [300, 100, 300],
         data: { url: './invoice.html' }
