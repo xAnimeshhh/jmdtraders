@@ -3514,37 +3514,7 @@ function updateSecurityDeposit() {
     return finalDepositAmt; // Yeh value calc() ko wapas jayegi
 }
 
-// Sahi tarika (getToken ke callback ke andar)
-messaging.getToken({ vapidKey: 'BIGw5CONpp1JTTf-hVzvLlEUJWRlM_NrqmngmSiMGkY4DrqJw-QehOMmFy-3J6rrs2-VJBdH6Z2ZO_-GJr3Bd6g' })
-  .then((currentToken) => {
-    if (currentToken) {
-      console.log("Token mil gaya:", currentToken);
-      
-      // AB YAHAN SUBSCRIBE KARO
-      subscribeToJMDTopic(currentToken); 
-      
-    } else {
-      console.log('Notification permission nahi mili.');
-    }
-  }).catch((err) => {
-    console.log('Token nikalne mein error:', err);
-  });
 
-// Ye function alag se bana lo
-function subscribeToJMDTopic(token) {
-  const topicUrl = "https://iid.googleapis.com/iid/v1/" + token + "/rel/topics/jmd_rent_updates";
-  
-  fetch(topicUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'key=cf0bbf1f3c2db86e315eba57c4c1a51f5ed9c155' // Firebase Console > Project Settings > Cloud Messaging (Legacy) wala Server Key
-    }
-  })
-  .then(response => {
-    if (response.ok) console.log("Topic Subscribed Successfully!");
-  })
-  .catch(err => console.log("Topic error:", err));
-}
 	
 const firebaseConfig = {
     apiKey: "AIzaSyCtXaYpbyg4A4rmj_27N4mUtE_IssWPCZM",
@@ -3580,6 +3550,38 @@ const firebaseConfig = {
       .catch((err) => console.log("Token Error:", err));
     });
   }
+
+// Sahi tarika (getToken ke callback ke andar)
+messaging.getToken({ vapidKey: 'BIGw5CONpp1JTTf-hVzvLlEUJWRlM_NrqmngmSiMGkY4DrqJw-QehOMmFy-3J6rrs2-VJBdH6Z2ZO_-GJr3Bd6g' })
+  .then((currentToken) => {
+    if (currentToken) {
+      console.log("Token mil gaya:", currentToken);
+      
+      // AB YAHAN SUBSCRIBE KARO
+      subscribeToJMDTopic(currentToken); 
+      
+    } else {
+      console.log('Notification permission nahi mili.');
+    }
+  }).catch((err) => {
+    console.log('Token nikalne mein error:', err);
+  });
+
+// Ye function alag se bana lo
+function subscribeToJMDTopic(token) {
+  const topicUrl = "https://iid.googleapis.com/iid/v1/" + token + "/rel/topics/jmd_rent_updates";
+  
+  fetch(topicUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'key=cf0bbf1f3c2db86e315eba57c4c1a51f5ed9c155' // Firebase Console > Project Settings > Cloud Messaging (Legacy) wala Server Key
+    }
+  })
+  .then(response => {
+    if (response.ok) console.log("Topic Subscribed Successfully!");
+  })
+  .catch(err => console.log("Topic error:", err));
+}
 </script>
 
 </body>
