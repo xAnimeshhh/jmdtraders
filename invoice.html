@@ -3513,9 +3513,6 @@ function updateSecurityDeposit() {
 
     return finalDepositAmt; // Yeh value calc() ko wapas jayegi
 }
-
-
-	
 const firebaseConfig = {
     apiKey: "AIzaSyCtXaYpbyg4A4rmj_27N4mUtE_IssWPCZM",
     authDomain: "jmd-traders.firebaseapp.com",
@@ -3523,75 +3520,52 @@ const firebaseConfig = {
     storageBucket: "jmd-traders.firebasestorage.app",
     messagingSenderId: "799017023327",
     appId: "1:799017023327:web:316a19b47283eb5b4c28ea"
-  };
+};
 
-  // 3. Firebase Initialize (Ye missing ho sakta hai)
-  firebase.initializeApp(firebaseConfig);
-  
-  // 4. Messaging Define karna (Isi ki wajah se error aa raha tha)
-  const messaging = firebase.messaging();
+// Firebase Initialize
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const messaging = firebase.messaging();
 
-  // 5. Ab Token mangne ka asli logic
-
+// Token mangne aur Service Worker register karne ka sahi logic
 if ('serviceWorker' in navigator) {
-      // 1. Pehle Service Worker ko manually register karo
-navigator.serviceWorker.register('/jmdtraders/firebase-messaging-sw.js')
-  .then((registration) => {
-    console.log('Service Worker Manual Registration Successful!');
+    navigator.serviceWorker.register('/jmdtraders/firebase-messaging-sw.js')
+    .then((registration) => {
+        console.log('Service Worker Manual Registration Successful!');
 
-    // 2. Ab getToken ko batao ki isi registration ko use kare
-    messaging.getToken({ 
-      vapidKey: 'BIGw5CONpp1JTTf-hVzvLlEUJWRlM_NrqmngmSiMGkY4DrqJw-QehOMmFy-3J6rrs2-VJBdH6Z2ZO_-GJr3Bd6g',
-      serviceWorkerRegistration: registration // Ye sabse important line hai
+        return messaging.getToken({ 
+            vapidKey: 'BIGw5CONpp1JTTf-hVzvLlEUJWRlM_NrqmngmSiMGkY4DrqJw-QehOMmFy-3J6rrs2-VJBdH6Z2ZO_-GJr3Bd6g',
+            serviceWorkerRegistration: registration 
+        });
     })
     .then((currentToken) => {
-      if (currentToken) {
-        console.log("Tera Token mil gaya bhai:", currentToken);
-        subscribeToJMDTopic(currentToken);
-      } else {
-        console.log('Permission nahi mili.');
-      }
+        if (currentToken) {
+            console.log("Tera Token mil gaya bhai:", currentToken);
+            subscribeToJMDTopic(currentToken);
+        } else {
+            console.log('Permission nahi mili.');
+        }
     })
     .catch((err) => {
-      console.log('Token error:', err);
+        console.log('Error setup mein:', err);
     });
-  })
-  .catch((err) => {
-    console.log('SW Registration failed:', err);
-  });
+} // <--- Ye wala bracket tumne pehle miss kiya tha
 
-// Sahi tarika (getToken ke callback ke andar)
-messaging.getToken({ vapidKey: 'BIGw5CONpp1JTTf-hVzvLlEUJWRlM_NrqmngmSiMGkY4DrqJw-QehOMmFy-3J6rrs2-VJBdH6Z2ZO_-GJr3Bd6g' })
-  .then((currentToken) => {
-    if (currentToken) {
-      console.log("Token mil gaya:", currentToken);
-      
-      // AB YAHAN SUBSCRIBE KARO
-      subscribeToJMDTopic(currentToken); 
-      
-    } else {
-      console.log('Notification permission nahi mili.');
-    }
-  }).catch((err) => {
-    console.log('Token nikalne mein error:', err);
-  });
-
-// Ye function alag se bana lo
+// Ye function alag se
 function subscribeToJMDTopic(token) {
-  const topicUrl = "https://iid.googleapis.com/iid/v1/" + token + "/rel/topics/jmd_rent_updates";
-  
-  fetch(topicUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'key=cf0bbf1f3c2db86e315eba57c4c1a51f5ed9c155' // Firebase Console > Project Settings > Cloud Messaging (Legacy) wala Server Key
-    }
-  })
-  .then(response => {
-    if (response.ok) console.log("Topic Subscribed Successfully!");
-  })
-  .catch(err => console.log("Topic error:", err));
+    const topicUrl = "https://iid.googleapis.com/iid/v1/" + token + "/rel/topics/jmd_rent_updates";
+    
+    fetch(topicUrl, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'key=cf0bbf1f3c2db86e315eba57c4c1a51f5ed9c155' 
+        }
+    })
+    .then(response => {
+        if (response.ok) console.log("Topic Subscribed Successfully!");
+    })
+    .catch(err => console.log("Topic error:", err));
 }
-</script>
-
 </body>
 </html>
