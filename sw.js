@@ -1,4 +1,4 @@
-const CACHE_NAME = "jmd-cache-v1";
+const CACHE_NAME = "jmd-cache-v2";
 
 // In files ko phone ki memory mein save karega (Offline ke liye)
 const urlsToCache = [
@@ -6,7 +6,6 @@ const urlsToCache = [
   "./invoice.html",
   "./dashboard.html",
   "https://i.postimg.cc/D0JzRh6x/download.png",
-  "https://i.postimg.cc/htQppn1q/jmd-app.png"
 ];
 
 // 1. INSTALL: Files save karna aur purane worker ko hatana
