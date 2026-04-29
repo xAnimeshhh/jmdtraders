@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<link rel="manifest" href="manifest.json">
     <style>
 :root { --wine: #4a0e0e; --text: #1e293b; --light: #f8fafc; }
 * { box-sizing: border-box; margin: 0; padding: 0; } /* Global Box Sizing */
@@ -3454,6 +3455,22 @@ function updateSecurityDeposit() {
 
     return finalDepositAmt; // Yeh value calc() ko wapas jayegi
 }
+	if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('App ready for notifications!'))
+        .catch(err => console.log('Error:', err));
+    });
+  }
+
+  // Permission mangne ke liye ye function kahin bhi call kar sakta hai
+  function enableNotifications() {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        alert("Ab aapko notifications milenge!");
+      }
+    });
+  }
 </script>
 
 </body>
