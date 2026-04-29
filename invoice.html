@@ -2001,7 +2001,8 @@ async function generateAndDownloadQR(invNo, total) {
 }
 function filterBills() {
     const searchTerm = document.getElementById('billSearchInput').value.toLowerCase();
-    
+
+	
     // 1. Pehle Current Filter (Rented/Returned) apply karo
     let filtered = currentCloudHistory;
     if (currentFilter !== 'all') {
