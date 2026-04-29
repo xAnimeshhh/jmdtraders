@@ -3533,7 +3533,7 @@ const firebaseConfig = {
 
   // 5. Ab Token mangne ka asli logic
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.0').then((reg) => {
+    navigator.serviceWorker.register('./firebase-messaging-sw.js?v=3.0').then((reg) => {
       console.log("Service Worker Registered!");
       
       messaging.getToken({ 
