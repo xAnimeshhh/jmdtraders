@@ -44,8 +44,8 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('push', function(event) {
     const options = {
         body: 'JMD Traders: Naya Bill Generate Hua Hai!',
-        icon: 'https://i.postimg.cc/D0JzRh6x/download.png',
-        badge: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        icon: 'https://i.postimg.cc/htQppn1q/jmd-app.png',
+        badge: 'https://i.postimg.cc/nhcgGrdj/jmdbadge.png',
         vibrate: [200, 100, 200]
     };
     event.waitUntil(self.registration.showNotification('JMD Traders Alert', options));
