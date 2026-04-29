@@ -11,7 +11,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 	<link rel="manifest" href="/jmdtraders/manifest.json">
-	<meta name="theme-color" content="#2563eb">
+	<meta name="theme-color" content="#850026">
     <style>
 :root { --wine: #4a0e0e; --text: #1e293b; --light: #f8fafc; }
 * { box-sizing: border-box; margin: 0; padding: 0; } /* Global Box Sizing */
@@ -2026,6 +2026,20 @@ function toSentenceCase(str) {
         return word.charAt(0).toUpperCase() + word.slice(1);
     }).join(' ');
 }
+function triggerBillNotification() {
+  if (Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(registration => {
+      registration.showNotification('JMD Traders Alert', {
+        body: 'Naya Bill Generate Hua Hai!',
+        icon: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        badge: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        vibrate: [200, 100, 200],
+        tag: 'bill-save', // Isse duplicate notifications nahi aayenge]
+        data: { url: './dashboard.html' }
+      });
+    });
+  }
+}
 async function saveBillToHistory() {
     const dashboardDays = parseInt(document.getElementById('totalDays')?.value || '1', 10) || 1;
     const address = document.getElementById('custAddress')?.value.trim() || "";
@@ -2108,7 +2122,7 @@ async function saveBillToHistory() {
             
             if (result.status === "success") {
                 showToast("Data Saved Successfully! ✅", "success");
-                
+                triggerBillNotification();
                 // --- INSTANT REFRESH LOGIC ---
                 // 1. Cloud se naya data wapas kheencho
                 const freshDataResponse = await fetch(SCRIPT_URL);
@@ -2139,6 +2153,7 @@ async function saveBillToHistory() {
     } else {
         executeFinalSave(new Date().toLocaleString('en-IN'));
     }
+	
 }
 function sendWhatsAppReminder(index) {
     const bill = currentCloudHistory[index];
@@ -2210,9 +2225,25 @@ function sendWhatsAppReminder(index) {
     // Final Link Open
     window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`, '_blank');
 }
+function triggerDailySummary(message) {
+  if (Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification('JMD Traders: Morning Report 📊', {
+        body: message + '. Click karke poori list dekhein!',
+        icon: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        badge: 'https://i.postimg.cc/D0JzRh6x/download.png',
+        tag: 'daily-summary', // Isse purana summary update ho jayega
+        vibrate: [300, 100, 300],
+        data: { url: './invoice.html' }
+      });
+    });
+  }
+}
 function renderTable(data) {
     const tbody = document.getElementById('billHistoryBody');
-    const dayTotalEl = document.getElementById('dayTotal'); 
+    let overdueCount = 0;   // Shuru mein zero
+    let upcomingCount = 0;  // Shuru mein zero
+	const dayTotalEl = document.getElementById('dayTotal'); 
     const dayCountEl = document.getElementById('dayCount'); 
 	const dayDepositEl = document.getElementById('dayDeposit'); // Naya
     const dayPendingEl = document.getElementById('dayPending'); // Naya
@@ -2244,12 +2275,20 @@ function renderTable(data) {
             currentPendingDeposit += parseFloat(bill.deposit || 0);
             pendingRentCount++;
         }
+		if (now > returnTime && bill.status === "Rented") {
+            overdueCount++; // Yahan ginti badh rahi hai
+        }
+        
+        // Jab logic check karega ki bill AAJ ya KAL aane wala hai:
+        else if (diffDays <= 1 && bill.status === "Rented") {
+            upcomingCount++; // Yahan ginti badh rahi hai
+        }
 		let overdueHtml = "";
         let itemsList = [];
         try {
             itemsList = Array.isArray(bill.items) ? bill.items : JSON.parse(bill.items || "[]");
         } catch(e) { itemsList = []; }
-
+		
         const isRental = itemsList.some(item => item.name && item.name.includes("(Rent)"));
 
         if (isRental && billDateStr) {
@@ -2335,7 +2374,20 @@ function renderTable(data) {
             </tr>
         `;
     }).join('');
+	if (overdueCount > 0 || upcomingCount > 0) {
+    	let summaryMessage = "";
+    
+    	if (overdueCount > 0) {
+       	 summaryMessage += `⚠️ ${overdueCount} Overdue Bills `;
+    	}
+    
+    	if (upcomingCount > 0) {
+        	summaryMessage += `${summaryMessage ? '& ' : ''}🕒 ${upcomingCount} Upcoming Returns`;
+    	}
 
+    // Ye function call karega jo summary dikhayega
+    triggerDailySummary(summaryMessage);
+	}
     if (dayTotalEl) dayTotalEl.innerText = "₹" + totalAmount.toLocaleString('en-IN');
     if (dayCountEl) dayCountEl.innerText = todayBillCount;
     if (dayDepositEl) dayDepositEl.innerText = "₹" + currentPendingDeposit.toLocaleString('en-IN');
