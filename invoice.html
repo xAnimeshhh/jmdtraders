@@ -2306,19 +2306,19 @@ function renderTable(data) {
                 const bDateTime = new Date(y, m, d, hr, min, sec);
                 const tDays = parseInt(bill.totaldays || 1);
                 const returnTime = new Date(bDateTime.getTime() + (tDays * 24 * 60 * 60 * 1000));
-				if (bill.status === "Rented") {
+				
+                if (now > returnTime) {
+                    // 1. LATE STATUS (Red)
+                    const diffMs = now - returnTime;
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    let label = diffDays > 0 ? `${diffDays} DIN LATE` : "OVERDUE";
+					if (bill.status === "Rented") {
                     if (now > returnTime) {
                         overdueCount++; // Ab ye chalega kyunki returnTime define ho chuka hai
                     } else if (diffDays <= 1) {
                         upcomingCount++; // Ab ye chalega kyunki diffDays define ho chuka hai
                     }
                 }
-                if (now > returnTime) {
-                    // 1. LATE STATUS (Red)
-                    const diffMs = now - returnTime;
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                    let label = diffDays > 0 ? `${diffDays} DIN LATE` : "OVERDUE";
-
                     overdueHtml = `
                         <div style="margin-top:5px; display:inline-block; background:#fff1f0; border:1px solid #ffa39e; color:#cf1322; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:bold;">
                             ⚠️ ${label}
